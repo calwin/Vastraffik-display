@@ -73,6 +73,14 @@ def get_departures():
         api = VasttrafikAPI()
         data = api.get_departures(stop_id, limit=10)
 
+        # Get stop name from the first result
+        stop_name = "Your Stop"
+        if 'results' in data and len(data['results']) > 0:
+            first_result = data['results'][0]
+            stop_name = first_result.get('stopPoint', {}).get('name', 'Your Stop')
+            # Clean up the stop name (remove ", Göteborg" suffix)
+            stop_name = stop_name.replace(', Göteborg', '').replace(', Goteborg', '')
+
         departures = []
         if 'results' in data and data['results']:
             for dep in data['results']:
@@ -84,6 +92,9 @@ def get_departures():
                 bg_color = line_info.get('backgroundColor', '#0098db')
                 fg_color = line_info.get('foregroundColor', '#ffffff')
                 border_color = line_info.get('borderColor', '#ffffff')
+
+                # Get transport mode (bus, tram, etc.)
+                transport_mode = line_info.get('transportMode', 'bus')
 
                 # Get planned and estimated times
                 planned_time_str = dep.get('plannedTime', '')
@@ -120,7 +131,8 @@ def get_departures():
                     'status': status,
                     'bg_color': bg_color,
                     'fg_color': fg_color,
-                    'border_color': border_color
+                    'border_color': border_color,
+                    'transport_mode': transport_mode
                 })
 
         # Use Swedish timezone for updated timestamp
@@ -129,6 +141,8 @@ def get_departures():
 
         return jsonify({
             'departures': departures,
+            'stop_name': stop_name,
+            'current_time': current_time.strftime('%H:%M'),
             'updated': current_time.strftime('%H:%M:%S')
         })
 

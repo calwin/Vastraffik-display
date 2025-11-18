@@ -22,25 +22,40 @@
         }
 
         .header {
-            text-align: center;
             margin-bottom: 20px;
             border-bottom: 2px solid #0098db;
             padding-bottom: 15px;
         }
 
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
         .header h1 {
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: bold;
             color: #0098db;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             text-shadow: 0 2px 10px rgba(0, 152, 219, 0.5);
+            margin: 0;
+        }
+
+        .current-time {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
         }
 
         .updated {
-            font-size: 1rem;
-            color: #aaa;
-            margin-top: 8px;
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
         }
 
         .departures-table {
@@ -70,6 +85,12 @@
             background-color: rgba(0, 152, 219, 0.1);
         }
 
+        .transport-icon {
+            font-size: 1.4rem;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
         .line {
             font-weight: bold;
             padding: 6px 12px;
@@ -80,6 +101,7 @@
             border: 2px solid;
             font-size: 1.2rem;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            vertical-align: middle;
             /* Colors applied dynamically from API */
         }
 
@@ -159,8 +181,10 @@
 </head>
 <body>
     <div class="header">
-        <h1>Departures</h1>
-        <div class="updated" id="current-time"></div>
+        <div class="header-top">
+            <h1 id="stop-name">Departures</h1>
+            <div class="current-time" id="current-time">--:--</div>
+        </div>
         <div class="updated" id="updated">Loading...</div>
     </div>
 
@@ -189,7 +213,9 @@
                 }
 
                 displayDepartures(data.departures);
-                document.getElementById('updated').textContent = `Updated: ${data.updated}`;
+                document.getElementById('stop-name').textContent = data.stop_name || 'Departures';
+                document.getElementById('current-time').textContent = data.current_time;
+                document.getElementById('updated').textContent = `Last updated: ${data.updated}`;
 
             } catch (error) {
                 showError('Failed to fetch departures: ' + error.message);
@@ -209,8 +235,7 @@
                             <th>Line</th>
                             <th>Direction</th>
                             <th>In</th>
-                            <th>Scheduled</th>
-                            <th>Actual</th>
+                            <th>Time</th>
                             <th>Track</th>
                         </tr>
                     </thead>
@@ -224,12 +249,14 @@
                 // Use API colors with inline styles
                 const lineStyle = `background-color: ${dep.bg_color}; color: ${dep.fg_color}; border-color: ${dep.border_color};`;
 
+                // Get transport icon
+                const transportIcon = dep.transport_mode === 'tram' ? '🚊' : '🚌';
+
                 html += `
                     <tr>
-                        <td><span class="line" style="${lineStyle}">${dep.line}</span></td>
+                        <td><span class="transport-icon">${transportIcon}</span> <span class="line" style="${lineStyle}">${dep.line}</span></td>
                         <td class="direction">${dep.direction}</td>
                         <td><span class="time ${statusClass}">${dep.relative_time}</span>${statusBadge}</td>
-                        <td><span class="scheduled-time">${dep.scheduled_time}</span></td>
                         <td><span class="actual-time ${statusClass}">${dep.actual_time}</span></td>
                         <td class="track">${dep.track}</td>
                     </tr>
