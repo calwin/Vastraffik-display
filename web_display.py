@@ -150,7 +150,7 @@ def get_voice_text():
 
     try:
         api = VasttrafikAPI()
-        data = api.get_departures(stop_id, limit=3)
+        data = api.get_departures(stop_id, limit=10)
 
         # Get stop name
         stop_name = "your stop"
@@ -164,7 +164,7 @@ def get_voice_text():
         parts = []
 
         if 'results' in data and data['results']:
-            for dep in data['results'][:3]:
+            for dep in data['results'][:5]:
                 line_info = dep.get('serviceJourney', {}).get('line', {})
                 line = line_info.get('shortName', 'unknown')
                 direction = dep.get('serviceJourney', {}).get('direction', 'unknown')
