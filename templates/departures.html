@@ -65,30 +65,14 @@
 
         .line {
             font-weight: bold;
-            color: #fff;
             padding: 10px 20px;
             border-radius: 5px;
             display: inline-block;
             min-width: 80px;
             text-align: center;
-            border: 2px solid #fff;
+            border: 2px solid;
+            /* Colors applied dynamically from API */
         }
-
-        /* Västtrafik line colors */
-        .line-1 { background-color: #808080; } /* Gray */
-        .line-2 { background-color: #ffd300; color: #000; } /* Yellow */
-        .line-3 { background-color: #0098db; } /* Blue */
-        .line-4 { background-color: #f5821f; } /* Orange */
-        .line-5 { background-color: #ed1c24; } /* Red */
-        .line-6 { background-color: #f49ac1; color: #000; } /* Pink */
-        .line-7 { background-color: #8b5e3c; } /* Brown */
-        .line-8 { background-color: #00a650; } /* Green */
-        .line-9 { background-color: #fff; color: #000; } /* White */
-        .line-10 { background-color: #a57bb6; } /* Light Purple */
-        .line-11 { background-color: #000; } /* Black */
-        .line-13 { background-color: #f7a600; color: #000; } /* Gold */
-        .line-16 { background-color: #00aeef; } /* Light Blue */
-        .line-17 { background-color: #6b2c91; } /* Purple/Violet */
 
         .direction {
             color: #fff;
@@ -219,11 +203,13 @@
             departures.forEach(dep => {
                 const statusClass = dep.status === 'delayed' ? 'delayed' : (dep.status === 'cancelled' ? 'cancelled' : '');
                 const statusBadge = dep.status === 'delayed' ? '<span class="status-badge">(delayed)</span>' : '';
-                const lineClass = `line-${dep.line}`;
+
+                // Use API colors with inline styles
+                const lineStyle = `background-color: ${dep.bg_color}; color: ${dep.fg_color}; border-color: ${dep.border_color};`;
 
                 html += `
                     <tr>
-                        <td><span class="line ${lineClass}">${dep.line}</span></td>
+                        <td><span class="line" style="${lineStyle}">${dep.line}</span></td>
                         <td class="direction">${dep.direction}</td>
                         <td><span class="time ${statusClass}">${dep.relative_time}</span>${statusBadge}</td>
                         <td><span class="scheduled-time">${dep.scheduled_time}</span></td>

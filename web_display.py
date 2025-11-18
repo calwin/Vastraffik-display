@@ -69,8 +69,14 @@ def get_departures():
         departures = []
         if 'results' in data and data['results']:
             for dep in data['results']:
-                line = dep.get('serviceJourney', {}).get('line', {}).get('shortName', 'N/A')
+                line_info = dep.get('serviceJourney', {}).get('line', {})
+                line = line_info.get('shortName', 'N/A')
                 direction = dep.get('serviceJourney', {}).get('direction', 'Unknown')
+
+                # Get line colors from API
+                bg_color = line_info.get('backgroundColor', '#0098db')
+                fg_color = line_info.get('foregroundColor', '#ffffff')
+                border_color = line_info.get('borderColor', '#ffffff')
 
                 # Get planned and estimated times
                 planned_time_str = dep.get('plannedTime', '')
@@ -104,7 +110,10 @@ def get_departures():
                     'scheduled_time': scheduled_time,
                     'actual_time': actual_time,
                     'track': track,
-                    'status': status
+                    'status': status,
+                    'bg_color': bg_color,
+                    'fg_color': fg_color,
+                    'border_color': border_color
                 })
 
         return jsonify({
