@@ -61,6 +61,70 @@ def index():
     return render_template('departures.html')
 
 
+@app.route('/api/voice')
+def get_voice_departures():
+    """API endpoint for voice assistants - returns simple text response."""
+    stop_id = os.getenv('STOP_ID')
+
+    if not stop_id:
+        return jsonify({'speech': 'Stop ID not configured.'}), 400
+
+    try:
+        api = VasttrafikAPI()
+        data = api.get_departures(stop_id, limit=5)  # Get next 5 departures
+
+        # Get stop name
+        stop_name = "your stop"
+        if 'results' in data and len(data['results']) > 0:
+            first_result = data['results'][0]
+            stop_name = first_result.get('stopPoint', {}).get('name', 'your stop')
+            stop_name = stop_name.replace(', Göteborg', '').replace(', Goteborg', '')
+
+        # Build voice response
+        speech_parts = [f"Next departures from {stop_name}:"]
+
+        if 'results' in data and data['results']:
+            for i, dep in enumerate(data['results'][:5], 1):
+                line_info = dep.get('serviceJourney', {}).get('line', {})
+                line = line_info.get('shortName', 'unknown')
+                direction = dep.get('serviceJourney', {}).get('direction', 'unknown destination')
+                transport_mode = line_info.get('transportMode', 'bus')
+
+                # Get times
+                estimated_time_str = dep.get('estimatedTime', '')
+                relative_time, actual_time = format_time(estimated_time_str) if estimated_time_str else ('-', '-')
+
+                # Check status
+                is_delayed = dep.get('estimatedTime') and dep.get('estimatedTime') != dep.get('plannedTime')
+                is_cancelled = dep.get('isCancelled', False)
+
+                track = dep.get('stopPoint', {}).get('platform', 'unknown platform')
+
+                # Build sentence
+                vehicle = "Tram" if transport_mode == "tram" else "Bus"
+
+                if is_cancelled:
+                    sentence = f"{vehicle} {line} to {direction} is cancelled."
+                else:
+                    delay_text = ", delayed" if is_delayed else ""
+                    sentence = f"{vehicle} {line} to {direction} in {relative_time} at platform {track}{delay_text}."
+
+                speech_parts.append(sentence)
+        else:
+            speech_parts.append("No departures found.")
+
+        speech_text = " ".join(speech_parts)
+
+        return jsonify({
+            'speech': speech_text,
+            'displayText': speech_text,
+            'stopName': stop_name
+        })
+
+    except Exception as e:
+        return jsonify({'speech': f'Error getting departures: {str(e)}'}), 500
+
+
 @app.route('/api/departures')
 def get_departures():
     """API endpoint to get current departures as JSON."""
