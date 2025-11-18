@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Västtrafik Departures</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #0098db;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #0098db;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .updated {
+            font-size: 1.5rem;
+            color: #888;
+            margin-top: 10px;
+        }
+
+        .departures-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .departures-table th {
+            background-color: #0098db;
+            color: #fff;
+            padding: 20px;
+            text-align: left;
+            font-size: 2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .departures-table td {
+            padding: 25px 20px;
+            font-size: 2.2rem;
+            border-bottom: 2px solid #333;
+        }
+
+        .line {
+            font-weight: bold;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: inline-block;
+            min-width: 80px;
+            text-align: center;
+            border: 2px solid #fff;
+        }
+
+        /* Västtrafik line colors */
+        .line-1 { background-color: #808080; } /* Gray */
+        .line-2 { background-color: #ffd300; color: #000; } /* Yellow */
+        .line-3 { background-color: #0098db; } /* Blue */
+        .line-4 { background-color: #f5821f; } /* Orange */
+        .line-5 { background-color: #ed1c24; } /* Red */
+        .line-6 { background-color: #f49ac1; color: #000; } /* Pink */
+        .line-7 { background-color: #8b5e3c; } /* Brown */
+        .line-8 { background-color: #00a650; } /* Green */
+        .line-9 { background-color: #fff; color: #000; } /* White */
+        .line-10 { background-color: #a57bb6; } /* Light Purple */
+        .line-11 { background-color: #000; } /* Black */
+        .line-13 { background-color: #f7a600; color: #000; } /* Gold */
+        .line-16 { background-color: #00aeef; } /* Light Blue */
+        .line-17 { background-color: #6b2c91; } /* Purple/Violet */
+
+        .direction {
+            color: #fff;
+        }
+
+        .time {
+            font-weight: bold;
+            color: #0f0;
+            min-width: 150px;
+            display: inline-block;
+        }
+
+        .time.delayed {
+            color: #ff6600;
+        }
+
+        .time.cancelled {
+            color: #f00;
+        }
+
+        .actual-time {
+            font-weight: bold;
+            color: #fff;
+            font-size: 2rem;
+        }
+
+        .track {
+            color: #888;
+            font-size: 1.8rem;
+        }
+
+        .status-badge {
+            font-size: 1.2rem;
+            color: #ff6600;
+            margin-left: 10px;
+        }
+
+        .error {
+            text-align: center;
+            color: #f00;
+            font-size: 2rem;
+            padding: 50px;
+        }
+
+        .loading {
+            text-align: center;
+            color: #0098db;
+            font-size: 2.5rem;
+            padding: 100px;
+        }
+
+        /* Animation for updates */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .departures-table tbody {
+            animation: fadeIn 0.5s ease-in;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Departures</h1>
+        <div class="updated" id="current-time"></div>
+        <div class="updated" id="updated">Loading...</div>
+    </div>
+
+    <div id="content">
+        <div class="loading">Loading departures...</div>
+    </div>
+
+    <script>
+        const REFRESH_INTERVAL = 600000; // 10 minutes (600 seconds)
+
+        function updateCurrentTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('current-time').textContent = `${hours}:${minutes}`;
+        }
+
+        async function fetchDepartures() {
+            try {
+                const response = await fetch('/api/departures');
+                const data = await response.json();
+
+                if (data.error) {
+                    showError(data.error);
+                    return;
+                }
+
+                displayDepartures(data.departures);
+                document.getElementById('updated').textContent = `Updated: ${data.updated}`;
+
+            } catch (error) {
+                showError('Failed to fetch departures: ' + error.message);
+            }
+        }
+
+        function displayDepartures(departures) {
+            if (!departures || departures.length === 0) {
+                document.getElementById('content').innerHTML = '<div class="error">No departures found</div>';
+                return;
+            }
+
+            let html = `
+                <table class="departures-table">
+                    <thead>
+                        <tr>
+                            <th>Line</th>
+                            <th>Direction</th>
+                            <th>In</th>
+                            <th>Time</th>
+                            <th>Track</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            departures.forEach(dep => {
+                const statusClass = dep.status === 'delayed' ? 'delayed' : (dep.status === 'cancelled' ? 'cancelled' : '');
+                const statusBadge = dep.status === 'delayed' ? '<span class="status-badge">(delayed)</span>' : '';
+                const lineClass = `line-${dep.line}`;
+
+                html += `
+                    <tr>
+                        <td><span class="line ${lineClass}">${dep.line}</span></td>
+                        <td class="direction">${dep.direction}</td>
+                        <td><span class="time ${statusClass}">${dep.relative_time}</span>${statusBadge}</td>
+                        <td><span class="actual-time">${dep.actual_time}</span></td>
+                        <td class="track">${dep.track}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('content').innerHTML = html;
+        }
+
+        function showError(message) {
+            document.getElementById('content').innerHTML = `<div class="error">${message}</div>`;
+        }
+
+        // Initial fetch
+        updateCurrentTime();
+        fetchDepartures();
+
+        // Update time every minute
+        setInterval(updateCurrentTime, 60000);
+
+        // Auto-refresh departures every 10 minutes
+        setInterval(fetchDepartures, REFRESH_INTERVAL);
+    </script>
+</body>
+</html>
