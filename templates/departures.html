@@ -61,6 +61,7 @@
         .departures-table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
         }
 
         .departures-table th {
@@ -73,6 +74,12 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+
+        .departures-table th:nth-child(1) { width: 15%; } /* Line */
+        .departures-table th:nth-child(2) { width: 45%; } /* Direction */
+        .departures-table th:nth-child(3) { width: 15%; } /* In */
+        .departures-table th:nth-child(4) { width: 15%; } /* Time */
+        .departures-table th:nth-child(5) { width: 10%; } /* Track */
 
         .departures-table td {
             padding: 15px 15px;
