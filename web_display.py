@@ -7,6 +7,7 @@ A web interface optimized for TV viewing.
 import os
 from flask import Flask, render_template, jsonify
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from vasttrafik_api import VasttrafikAPI
 from dotenv import load_dotenv
 
@@ -122,9 +123,13 @@ def get_departures():
                     'border_color': border_color
                 })
 
+        # Use Swedish timezone for updated timestamp
+        sweden_tz = ZoneInfo('Europe/Stockholm')
+        current_time = datetime.now(sweden_tz)
+
         return jsonify({
             'departures': departures,
-            'updated': datetime.now().strftime('%H:%M:%S')
+            'updated': current_time.strftime('%H:%M:%S')
         })
 
     except Exception as e:
