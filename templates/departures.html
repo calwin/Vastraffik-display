@@ -15,31 +15,32 @@
         }
 
         body {
-            background-color: #000;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
             color: #fff;
-            font-family: 'Arial', 'Helvetica', sans-serif;
-            padding: 40px;
+            font-family: 'Segoe UI', 'Arial', 'Helvetica', sans-serif;
+            padding: 20px 30px;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 3px solid #0098db;
-            padding-bottom: 20px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #0098db;
+            padding-bottom: 15px;
         }
 
         .header h1 {
-            font-size: 3.5rem;
+            font-size: 2.5rem;
             font-weight: bold;
             color: #0098db;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            text-shadow: 0 2px 10px rgba(0, 152, 219, 0.5);
         }
 
         .updated {
-            font-size: 1.5rem;
-            color: #888;
-            margin-top: 10px;
+            font-size: 1rem;
+            color: #aaa;
+            margin-top: 8px;
         }
 
         .departures-table {
@@ -50,27 +51,35 @@
         .departures-table th {
             background-color: #0098db;
             color: #fff;
-            padding: 20px;
+            padding: 12px 15px;
             text-align: left;
-            font-size: 2rem;
+            font-size: 1.1rem;
             font-weight: bold;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .departures-table td {
-            padding: 25px 20px;
-            font-size: 2.2rem;
-            border-bottom: 2px solid #333;
+            padding: 15px 15px;
+            font-size: 1.3rem;
+            border-bottom: 1px solid #333;
+            transition: background-color 0.3s ease;
+        }
+
+        .departures-table tbody tr:hover {
+            background-color: rgba(0, 152, 219, 0.1);
         }
 
         .line {
             font-weight: bold;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 6px 12px;
+            border-radius: 4px;
             display: inline-block;
-            min-width: 80px;
+            min-width: 50px;
             text-align: center;
             border: 2px solid;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
             /* Colors applied dynamically from API */
         }
 
@@ -80,53 +89,61 @@
 
         .time {
             font-weight: bold;
-            color: #0f0;
-            min-width: 150px;
+            color: #00ff88;
+            min-width: 90px;
             display: inline-block;
         }
 
         .time.delayed {
-            color: #ff6600;
+            color: #ff9933;
         }
 
         .time.cancelled {
-            color: #f00;
+            color: #ff4444;
         }
 
         .scheduled-time {
-            color: #888;
-            font-size: 1.8rem;
+            color: #999;
+            font-size: 1.2rem;
         }
 
         .actual-time {
             font-weight: bold;
             color: #fff;
-            font-size: 2rem;
+            font-size: 1.4rem;
         }
 
         .track {
-            color: #888;
-            font-size: 1.8rem;
+            color: #aaa;
+            font-size: 1.2rem;
+            font-weight: 600;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 3px;
+            display: inline-block;
+            min-width: 30px;
+            text-align: center;
         }
 
         .status-badge {
-            font-size: 1.2rem;
-            color: #ff6600;
-            margin-left: 10px;
+            font-size: 0.9rem;
+            color: #ff9933;
+            margin-left: 8px;
+            opacity: 0.8;
         }
 
         .error {
             text-align: center;
-            color: #f00;
-            font-size: 2rem;
-            padding: 50px;
+            color: #ff4444;
+            font-size: 1.3rem;
+            padding: 40px;
         }
 
         .loading {
             text-align: center;
             color: #0098db;
-            font-size: 2.5rem;
-            padding: 100px;
+            font-size: 1.5rem;
+            padding: 60px;
         }
 
         /* Animation for updates */
