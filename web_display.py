@@ -18,13 +18,14 @@ app = Flask(__name__)
 def format_time(departure_time_str):
     """Format departure time - returns tuple of (relative_time, actual_time)."""
     try:
-        # Remove timezone offset and milliseconds for parsing
-        time_str = departure_time_str.split('.')[0]
-        if '+' in departure_time_str:
-            time_str = departure_time_str.split('+')[0].split('.')[0]
+        # Clean up the timestamp - remove excessive microseconds and handle timezone
+        import re
+        # Replace .0000000 with .000000 (max 6 digits for microseconds)
+        clean_time = re.sub(r'\.(\d{7,})', lambda m: '.' + m.group(1)[:6], departure_time_str)
+        clean_time = clean_time.replace('Z', '+00:00')
 
-        dept_time = datetime.fromisoformat(time_str)
-        now = datetime.now()
+        dept_time = datetime.fromisoformat(clean_time)
+        now = datetime.now(dept_time.tzinfo)
         diff = (dept_time - now).total_seconds() / 60
 
         # Get the actual time HH:MM
@@ -35,7 +36,12 @@ def format_time(departure_time_str):
         elif diff < 60:
             relative_time = f"{int(diff)} min"
         else:
-            relative_time = "-"
+            # Show hours for longer waits
+            hours = int(diff / 60)
+            if hours == 1:
+                relative_time = "1 hour"
+            else:
+                relative_time = f"{hours} hours"
 
         return relative_time, actual_time
     except Exception as e:
