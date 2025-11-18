@@ -15,81 +15,105 @@
         }
 
         body {
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            background: #0d1117;
             color: #fff;
-            font-family: 'Segoe UI', 'Arial', 'Helvetica', sans-serif;
-            padding: 20px 30px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            padding: 0;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100vw;
+            padding: 25px 40px;
         }
 
         .header {
-            margin-bottom: 20px;
-            border-bottom: 2px solid #0098db;
-            padding-bottom: 15px;
+            background: linear-gradient(135deg, #161b22 0%, #1c2128 100%);
+            border-radius: 12px;
+            padding: 20px 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid #30363d;
         }
 
         .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .header h1 {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #0098db;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #58a6ff;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 0 2px 10px rgba(0, 152, 219, 0.5);
+            letter-spacing: 3px;
             margin: 0;
         }
 
         .current-time {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #fff;
-            font-family: 'Courier New', monospace;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            font-size: 2.8rem;
+            font-weight: 300;
+            color: #ffffff;
+            font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+            letter-spacing: 2px;
         }
 
         .updated {
-            font-size: 0.9rem;
-            color: #666;
+            font-size: 0.85rem;
+            color: #8b949e;
             text-align: center;
+            opacity: 0.7;
         }
 
         .departures-table {
             width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: #161b22;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
         .departures-table th {
-            background-color: #0098db;
+            background: linear-gradient(135deg, #1f6feb 0%, #1a5ad7 100%);
             color: #fff;
-            padding: 12px 15px;
+            padding: 14px 18px;
             text-align: left;
-            font-size: 1.1rem;
-            font-weight: bold;
+            font-size: 0.95rem;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
+            border-bottom: 2px solid #0d1117;
         }
 
-        .departures-table th:nth-child(1) { width: 15%; } /* Line */
-        .departures-table th:nth-child(2) { width: 45%; } /* Direction */
-        .departures-table th:nth-child(3) { width: 15%; } /* In */
-        .departures-table th:nth-child(4) { width: 15%; } /* Time */
-        .departures-table th:nth-child(5) { width: 10%; } /* Track */
+        .departures-table th:first-child { padding-left: 25px; }
+        .departures-table th:last-child { padding-right: 25px; }
 
         .departures-table td {
-            padding: 15px 15px;
-            font-size: 1.3rem;
-            border-bottom: 1px solid #333;
-            transition: background-color 0.3s ease;
+            padding: 16px 18px;
+            font-size: 1.15rem;
+            border-bottom: 1px solid #21262d;
+            transition: all 0.2s ease;
+        }
+
+        .departures-table td:first-child { padding-left: 25px; }
+        .departures-table td:last-child { padding-right: 25px; }
+
+        .departures-table tbody tr {
+            background: #0d1117;
         }
 
         .departures-table tbody tr:hover {
-            background-color: rgba(0, 152, 219, 0.1);
+            background: #161b22;
+            transform: scale(1.005);
+        }
+
+        .departures-table tbody tr:last-child td {
+            border-bottom: none;
         }
 
         .transport-icon {
@@ -99,66 +123,72 @@
         }
 
         .line {
-            font-weight: bold;
-            padding: 6px 12px;
-            border-radius: 4px;
+            font-weight: 700;
+            padding: 5px 14px;
+            border-radius: 6px;
             display: inline-block;
-            min-width: 50px;
+            min-width: 45px;
             text-align: center;
             border: 2px solid;
-            font-size: 1.2rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-size: 1.05rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
             vertical-align: middle;
             /* Colors applied dynamically from API */
         }
 
         .direction {
-            color: #fff;
+            color: #e6edf3;
+            font-weight: 400;
         }
 
         .time {
-            font-weight: bold;
-            color: #00ff88;
-            min-width: 90px;
+            font-weight: 700;
+            color: #3fb950;
+            min-width: 70px;
             display: inline-block;
+            font-size: 1.1rem;
         }
 
         .time.delayed {
-            color: #ff9933;
+            color: #f85149;
         }
 
         .time.cancelled {
-            color: #ff4444;
-        }
-
-        .scheduled-time {
-            color: #999;
-            font-size: 1.2rem;
+            color: #d73a49;
+            text-decoration: line-through;
         }
 
         .actual-time {
-            font-weight: bold;
-            color: #fff;
-            font-size: 1.4rem;
+            font-weight: 600;
+            color: #e6edf3;
+            font-size: 1.15rem;
+            font-family: 'SF Mono', 'Consolas', monospace;
+        }
+
+        .actual-time.delayed {
+            color: #ff9933;
         }
 
         .track {
-            color: #aaa;
-            font-size: 1.2rem;
-            font-weight: 600;
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 4px 10px;
-            border-radius: 3px;
+            color: #c9d1d9;
+            font-size: 1.1rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #21262d 0%, #30363d 100%);
+            padding: 6px 12px;
+            border-radius: 6px;
             display: inline-block;
-            min-width: 30px;
+            min-width: 35px;
             text-align: center;
+            border: 1px solid #30363d;
+            box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.05);
         }
 
         .status-badge {
-            font-size: 0.9rem;
-            color: #ff9933;
-            margin-left: 8px;
-            opacity: 0.8;
+            font-size: 0.75rem;
+            color: #f85149;
+            margin-left: 6px;
+            opacity: 0.9;
+            font-weight: 500;
         }
 
         .error {
@@ -187,16 +217,18 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-top">
-            <h1 id="stop-name">Departures</h1>
-            <div class="current-time" id="current-time">--:--</div>
+    <div class="container">
+        <div class="header">
+            <div class="header-top">
+                <h1 id="stop-name">Departures</h1>
+                <div class="current-time" id="current-time">--:--</div>
+            </div>
+            <div class="updated" id="updated">Loading...</div>
         </div>
-        <div class="updated" id="updated">Loading...</div>
-    </div>
 
-    <div id="content">
-        <div class="loading">Loading departures...</div>
+        <div id="content">
+            <div class="loading">Loading departures...</div>
+        </div>
     </div>
 
     <script>
