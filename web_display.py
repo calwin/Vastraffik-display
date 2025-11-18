@@ -178,10 +178,12 @@ def get_voice_text():
 
                 vehicle = "Tram" if transport_mode == "tram" else "Bus"
 
-                # Simple format: "Tram 3 to Destination in 5 min at platform A"
-                parts.append(f"{vehicle} {line} to {direction} in {relative_time} at platform {track}")
+                # Add emphasis with pauses for line number and time
+                # Using commas and periods to create natural pauses for Siri
+                parts.append(f"{vehicle} number {line}, to {direction}, in {relative_time}, platform {track}")
 
-            return f"From {stop_name}. " + ". ".join(parts) + "."
+            # Join with longer pauses between departures
+            return f"From {stop_name}. " + ". ... ".join(parts) + "."
         else:
             return f"No departures from {stop_name}."
 
