@@ -125,6 +125,21 @@ def get_voice_departures():
         return jsonify({'speech': f'Error getting departures: {str(e)}'}), 500
 
 
+def normalize_swedish(text):
+    """Normalize Swedish characters for English pronunciation."""
+    replacements = {
+        'å': 'o',
+        'ä': 'a',
+        'ö': 'o',
+        'Å': 'O',
+        'Ä': 'A',
+        'Ö': 'O'
+    }
+    for swedish, english in replacements.items():
+        text = text.replace(swedish, english)
+    return text
+
+
 @app.route('/api/voice/text')
 def get_voice_text():
     """Returns plain text for easier IFTTT integration."""
@@ -143,6 +158,7 @@ def get_voice_text():
             first_result = data['results'][0]
             stop_name = first_result.get('stopPoint', {}).get('name', 'your stop')
             stop_name = stop_name.replace(', Göteborg', '').replace(', Goteborg', '')
+            stop_name = normalize_swedish(stop_name)
 
         # Build simple response
         parts = []
@@ -152,19 +168,20 @@ def get_voice_text():
                 line_info = dep.get('serviceJourney', {}).get('line', {})
                 line = line_info.get('shortName', 'unknown')
                 direction = dep.get('serviceJourney', {}).get('direction', 'unknown')
+                direction = normalize_swedish(direction)
                 transport_mode = line_info.get('transportMode', 'bus')
 
                 estimated_time_str = dep.get('estimatedTime', '')
                 relative_time, _ = format_time(estimated_time_str) if estimated_time_str else ('-', '-')
 
-                is_delayed = dep.get('estimatedTime') and dep.get('estimatedTime') != dep.get('plannedTime')
+                track = dep.get('stopPoint', {}).get('platform', '')
 
                 vehicle = "Tram" if transport_mode == "tram" else "Bus"
-                delay = " delayed" if is_delayed else ""
 
-                parts.append(f"{vehicle} {line} to {direction} in {relative_time}{delay}")
+                # Simple format: "Tram 3 to Destination in 5 min at platform A"
+                parts.append(f"{vehicle} {line} to {direction} in {relative_time} at platform {track}")
 
-            return f"From {stop_name}: " + ". ".join(parts) + "."
+            return f"From {stop_name}. " + ". ".join(parts) + "."
         else:
             return f"No departures from {stop_name}."
 
