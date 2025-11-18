@@ -224,12 +224,18 @@ def get_voice_tamil():
                 estimated_time_str = dep.get('estimatedTime', '')
                 relative_time, _ = format_time(estimated_time_str) if estimated_time_str else ('-', '-')
 
+                # Convert to Tamil time
+                if relative_time == "Now":
+                    relative_time = "இன்னும் சற்று நேரத்தில்"
+                elif "min" in relative_time:
+                    relative_time = relative_time.replace("min", "நிமிடத்தில்")
+
                 track = dep.get('stopPoint', {}).get('platform', '')
 
                 vehicle = "ட்ராம்" if transport_mode == "tram" else "பஸ்"
 
                 # Tamil railway style
-                parts.append(f"{vehicle} எண் {line}, {direction} செல்லும், பிளாட்பார்ம் {track} இல், {relative_time} இல் வரும்")
+                parts.append(f"{vehicle} எண் {line}, {direction} செல்லும், பிளாட்பார்ம் {track} இல், {relative_time} வரும்")
 
             # Tamil announcement style
             announcement = f"கவனிக்கவும். {stop_name} இல் இருந்து. " + ". அடுத்து, ".join(parts) + ". நன்றி."
