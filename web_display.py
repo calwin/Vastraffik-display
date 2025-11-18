@@ -71,7 +71,7 @@ def get_voice_departures():
 
     try:
         api = VasttrafikAPI()
-        data = api.get_departures(stop_id, limit=5)  # Get next 5 departures
+        data = api.get_departures(stop_id, limit=3)  # Get next 3 departures (shorter for voice)
 
         # Get stop name
         stop_name = "your stop"
@@ -84,7 +84,7 @@ def get_voice_departures():
         speech_parts = [f"Next departures from {stop_name}:"]
 
         if 'results' in data and data['results']:
-            for i, dep in enumerate(data['results'][:5], 1):
+            for i, dep in enumerate(data['results'][:3], 1):
                 line_info = dep.get('serviceJourney', {}).get('line', {})
                 line = line_info.get('shortName', 'unknown')
                 direction = dep.get('serviceJourney', {}).get('direction', 'unknown destination')
@@ -123,6 +123,53 @@ def get_voice_departures():
 
     except Exception as e:
         return jsonify({'speech': f'Error getting departures: {str(e)}'}), 500
+
+
+@app.route('/api/voice/text')
+def get_voice_text():
+    """Returns plain text for easier IFTTT integration."""
+    stop_id = os.getenv('STOP_ID')
+
+    if not stop_id:
+        return 'Stop ID not configured.', 400
+
+    try:
+        api = VasttrafikAPI()
+        data = api.get_departures(stop_id, limit=3)
+
+        # Get stop name
+        stop_name = "your stop"
+        if 'results' in data and len(data['results']) > 0:
+            first_result = data['results'][0]
+            stop_name = first_result.get('stopPoint', {}).get('name', 'your stop')
+            stop_name = stop_name.replace(', Göteborg', '').replace(', Goteborg', '')
+
+        # Build simple response
+        parts = []
+
+        if 'results' in data and data['results']:
+            for dep in data['results'][:3]:
+                line_info = dep.get('serviceJourney', {}).get('line', {})
+                line = line_info.get('shortName', 'unknown')
+                direction = dep.get('serviceJourney', {}).get('direction', 'unknown')
+                transport_mode = line_info.get('transportMode', 'bus')
+
+                estimated_time_str = dep.get('estimatedTime', '')
+                relative_time, _ = format_time(estimated_time_str) if estimated_time_str else ('-', '-')
+
+                is_delayed = dep.get('estimatedTime') and dep.get('estimatedTime') != dep.get('plannedTime')
+
+                vehicle = "Tram" if transport_mode == "tram" else "Bus"
+                delay = " delayed" if is_delayed else ""
+
+                parts.append(f"{vehicle} {line} to {direction} in {relative_time}{delay}")
+
+            return f"From {stop_name}: " + ". ".join(parts) + "."
+        else:
+            return f"No departures from {stop_name}."
+
+    except Exception as e:
+        return f'Error: {str(e)}', 500
 
 
 @app.route('/api/departures')
