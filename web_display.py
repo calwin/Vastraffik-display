@@ -72,13 +72,20 @@ def get_departures():
                 line = dep.get('serviceJourney', {}).get('line', {}).get('shortName', 'N/A')
                 direction = dep.get('serviceJourney', {}).get('direction', 'Unknown')
 
-                # Get planned or estimated time
-                departure_time = dep.get('estimatedTime') or dep.get('plannedTime', '')
+                # Get planned and estimated times
+                planned_time_str = dep.get('plannedTime', '')
+                estimated_time_str = dep.get('estimatedTime', '')
+
+                # Use estimated if available, otherwise planned
+                departure_time = estimated_time_str or planned_time_str
                 relative_time, actual_time = format_time(departure_time)
+
+                # Get scheduled time separately
+                _, scheduled_time = format_time(planned_time_str) if planned_time_str else ('-', '-')
 
                 # Check if delayed or cancelled
                 is_cancelled = dep.get('isCancelled', False)
-                is_delayed = dep.get('estimatedTime') and dep.get('estimatedTime') != dep.get('plannedTime')
+                is_delayed = estimated_time_str and estimated_time_str != planned_time_str
 
                 if is_cancelled:
                     relative_time = "CANCELLED"
@@ -94,6 +101,7 @@ def get_departures():
                     'line': line,
                     'direction': direction,
                     'relative_time': relative_time,
+                    'scheduled_time': scheduled_time,
                     'actual_time': actual_time,
                     'track': track,
                     'status': status

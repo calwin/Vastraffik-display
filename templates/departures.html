@@ -109,6 +109,11 @@
             color: #f00;
         }
 
+        .scheduled-time {
+            color: #888;
+            font-size: 1.8rem;
+        }
+
         .actual-time {
             font-weight: bold;
             color: #fff;
@@ -203,7 +208,8 @@
                             <th>Line</th>
                             <th>Direction</th>
                             <th>In</th>
-                            <th>Time</th>
+                            <th>Scheduled</th>
+                            <th>Actual</th>
                             <th>Track</th>
                         </tr>
                     </thead>
@@ -220,7 +226,8 @@
                         <td><span class="line ${lineClass}">${dep.line}</span></td>
                         <td class="direction">${dep.direction}</td>
                         <td><span class="time ${statusClass}">${dep.relative_time}</span>${statusBadge}</td>
-                        <td><span class="actual-time">${dep.actual_time}</span></td>
+                        <td><span class="scheduled-time">${dep.scheduled_time}</span></td>
+                        <td><span class="actual-time ${statusClass}">${dep.actual_time}</span></td>
                         <td class="track">${dep.track}</td>
                     </tr>
                 `;
