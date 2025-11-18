@@ -191,6 +191,56 @@ def get_voice_text():
         return f'Error: {str(e)}', 500
 
 
+@app.route('/api/voice/tamil')
+def get_voice_tamil():
+    """Returns Tamil language response."""
+    stop_id = os.getenv('STOP_ID')
+
+    if not stop_id:
+        return 'நிறுத்த ஐடி கட்டமைக்கப்படவில்லை', 400
+
+    try:
+        api = VasttrafikAPI()
+        data = api.get_departures(stop_id, limit=10)
+
+        # Get stop name
+        stop_name = "உங்கள் நிலையம்"
+        if 'results' in data and len(data['results']) > 0:
+            first_result = data['results'][0]
+            stop_name = first_result.get('stopPoint', {}).get('name', 'your stop')
+            stop_name = stop_name.replace(', Göteborg', '').replace(', Goteborg', '')
+            # Don't normalize for Tamil - keep original
+
+        # Build Tamil response
+        parts = []
+
+        if 'results' in data and data['results']:
+            for dep in data['results'][:5]:
+                line_info = dep.get('serviceJourney', {}).get('line', {})
+                line = line_info.get('shortName', 'unknown')
+                direction = dep.get('serviceJourney', {}).get('direction', 'unknown')
+                transport_mode = line_info.get('transportMode', 'bus')
+
+                estimated_time_str = dep.get('estimatedTime', '')
+                relative_time, _ = format_time(estimated_time_str) if estimated_time_str else ('-', '-')
+
+                track = dep.get('stopPoint', {}).get('platform', '')
+
+                vehicle = "ட்ராம்" if transport_mode == "tram" else "பஸ்"
+
+                # Tamil railway style
+                parts.append(f"{vehicle} எண் {line}, {direction} செல்லும், பிளாட்பார்ம் {track} இல், {relative_time} இல் வரும்")
+
+            # Tamil announcement style
+            announcement = f"கவனிக்கவும். {stop_name} இல் இருந்து. " + ". அடுத்து, ".join(parts) + ". நன்றி."
+            return announcement
+        else:
+            return f"{stop_name} இல் இருந்து புறப்படும் வண்டிகள் இல்லை."
+
+    except Exception as e:
+        return f'பிழை: {str(e)}', 500
+
+
 @app.route('/api/departures')
 def get_departures():
     """API endpoint to get current departures as JSON."""
